@@ -13,10 +13,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { updateConfigurationId, state$ } from "@/store";
-import { BASE_URL } from "@/utils/utils";
 const configId = ref("1");
 onMounted(() => {
-  const subscription = state$.subscribe((state) => {
+  state$.subscribe((state) => {
     if (state.initialId) {
       configId.value = state.initialId;
     }

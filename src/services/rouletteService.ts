@@ -8,7 +8,7 @@ export const fetchRouletteConfig = (
   configurationId: string
 ): Observable<RouletteConfig> => {
   return from(fetch(`${BASE_URL}${configurationId}/configuration`)).pipe(
-    switchMap(async (response) => {
+    switchMap((response) => {
       if (response.ok) {
         return response.json() as Promise<RouletteConfig>;
       } else {
@@ -27,7 +27,7 @@ export const fetchRouletteStats = (
   configurationId: string
 ): Observable<RouletteStats[]> => {
   return from(fetch(`${BASE_URL}${configurationId}/stats?limit=200`)).pipe(
-    switchMap(async (response) => {
+    switchMap((response) => {
       if (response.ok) {
         return response.json() as Promise<RouletteStats[]>;
       } else {

@@ -14,7 +14,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    number: Number,
+    number: String,
     color: String,
   },
   setup(props) {

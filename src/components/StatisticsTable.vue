@@ -28,35 +28,35 @@
         <th>Slot</th>
         <template
           v-for="item in statistics?.[statsCategoriesEnum.COLD]"
-          :key="item.result"
+          :key="item.rouletteNumber"
         >
           <td
             class="board-number-color"
-            :style="{ backgroundColor: getColor(item.color) }"
+            :style="{ backgroundColor: getColor(item.rouletteColor) }"
           >
-            {{ item.result }}
+            {{ item.rouletteNumber }}
           </td>
         </template>
         <template
           v-for="item in statistics?.[statsCategoriesEnum.NEUTRAL]"
-          :key="item.result"
+          :key="item.rouletteNumber"
         >
           <td
             class="board-number-color"
-            :style="{ backgroundColor: getColor(item.color) }"
+            :style="{ backgroundColor: getColor(item.rouletteColor) }"
           >
-            {{ item.result }}
+            {{ item.rouletteNumber }}
           </td>
         </template>
         <template
           v-for="item in statistics?.[statsCategoriesEnum.HOT]"
-          :key="item.result"
+          :key="item.rouletteNumber"
         >
           <td
             class="board-number-color"
-            :style="{ backgroundColor: getColor(item.color) }"
+            :style="{ backgroundColor: getColor(item.rouletteColor) }"
           >
-            {{ item.result }}
+            {{ item.rouletteNumber }}
           </td>
         </template>
       </tr>
@@ -64,19 +64,19 @@
         <th>Hits</th>
         <template
           v-for="item in statistics?.[statsCategoriesEnum.COLD]"
-          :key="item.result"
+          :key="item.statisticsResult"
         >
           <td class="category-cold">{{ item.count }}</td>
         </template>
         <template
           v-for="item in statistics?.[statsCategoriesEnum.NEUTRAL]"
-          :key="item.result"
+          :key="item.statisticsResult"
         >
           <td class="category-neutral">{{ item.count }}</td>
         </template>
         <template
           v-for="item in statistics?.[statsCategoriesEnum.HOT]"
-          :key="item.result"
+          :key="item.statisticsResult"
         >
           <td class="category-hot">{{ item.count }}</td>
         </template>

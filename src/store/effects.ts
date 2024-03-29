@@ -14,7 +14,6 @@ import { switchMap, tap } from "rxjs/operators";
 updateConfigurationId
   .pipe(
     tap((configurationId) => {
-      console.log(configurationId); // initialId
       updateState({ configurationId });
       fetchConfiguration.next(configurationId);
       fetchStatistics.next(configurationId);
@@ -26,10 +25,7 @@ fetchConfiguration
   .pipe(
     switchMap((configurationId) => fetchRouletteConfig(configurationId)),
     tap((configuration) => {
-      const rouletteNumbers = mapNumbersToColors({
-        ...store.value,
-        configuration,
-      });
+      const rouletteNumbers = mapNumbersToColors(configuration);
       updateState({ configuration, rouletteNumbers });
     })
   )
