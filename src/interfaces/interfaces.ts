@@ -1,14 +1,14 @@
 export interface RouletteConfig {
   name: string;
-  slot?: number;
+  slots: number;
   results: string[];
   colors: string[];
   positionToId: number[];
 }
 
 export interface RouletteNumberProps {
-  number?: number;
-  color: string;
+  rouletteNumber: string;
+  rouletteColor: string;
 }
 
 export interface RouletteStats {
@@ -16,7 +16,7 @@ export interface RouletteStats {
   count: number;
 }
 
-export type CombinedRouletteTypes = RouletteNumberProps & RouletteStats;
+export type CombinedRouletteStats = RouletteNumberProps & RouletteStats;
 
 export interface AppState {
   configurationId: string;
@@ -27,14 +27,19 @@ export interface AppState {
 }
 
 export interface CategorizedData {
-  cold: CombinedRouletteTypes[];
-  neutral: CombinedRouletteTypes[];
-  hot: CombinedRouletteTypes[];
+  cold: CombinedRouletteStats[];
+  neutral: CombinedRouletteStats[];
+  hot: CombinedRouletteStats[];
 }
 
 export interface ErrorMsg {
   status: number;
   message: string;
+}
+
+export enum BoardTypes {
+  SINGLE = "singleZero",
+  DOUBLE = "doubleZero",
 }
 
 export enum StatsCategories {

@@ -5,14 +5,13 @@
     <div class="roulette-board">
       <RouletteNumber
         v-for="item in numberColors"
-        :key="item.number"
-        :number="item.number"
-        :color="item.color"
+        :key="item.rouletteNumber"
+        :number="item.rouletteNumber"
+        :color="item.rouletteColor"
       />
     </div>
   </div>
 </template>
-
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted, watch } from "vue";
 import { updateConfigurationId, state$ } from "@/store";

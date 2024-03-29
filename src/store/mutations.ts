@@ -1,15 +1,22 @@
 import {
   AppState,
   CategorizedData,
+  RouletteConfig,
   RouletteNumberProps,
 } from "@/interfaces/interfaces";
 import { mapStatsToNumbers } from "@/utils/utils";
 
-export const mapNumbersToColors = (state: AppState): RouletteNumberProps[] => {
-  if (!state.configuration) return [];
-  return state.configuration.positionToId.map((num, index) => ({
-    number: num,
-    color: state.configuration?.colors[index] ?? "white",
+export const mapNumbersToColors = (
+  configuration: RouletteConfig
+): RouletteNumberProps[] => {
+  if (!configuration) return [];
+  return configuration.positionToId.map((num, index) => ({
+    rouletteNumber:
+      configuration.slots === 38 && num === 37 ? "00" : num.toString(),
+    rouletteColor:
+      configuration.slots === 38 && num === 37
+        ? "green"
+        : configuration?.colors[index],
   }));
 };
 
