@@ -2,11 +2,12 @@ import { RouletteConfig, RouletteStats } from "@/interfaces/interfaces";
 import { from, Observable, throwError } from "rxjs";
 import { catchError, retry, switchMap } from "rxjs/operators";
 import { retryDelayStrategy } from "./errorHandling";
+import { BASE_URL } from "@/utils/utils";
 
 export const fetchRouletteConfig = (
   configurationId: string
 ): Observable<RouletteConfig> => {
-  return from(fetch(`${configurationId}/configuration`)).pipe(
+  return from(fetch(`${BASE_URL}${configurationId}/configuration`)).pipe(
     switchMap(async (response) => {
       if (response.ok) {
         return response.json() as Promise<RouletteConfig>;
@@ -25,7 +26,7 @@ export const fetchRouletteConfig = (
 export const fetchRouletteStats = (
   configurationId: string
 ): Observable<RouletteStats[]> => {
-  return from(fetch(`${configurationId}/stats?limit=200`)).pipe(
+  return from(fetch(`${BASE_URL}${configurationId}/stats?limit=200`)).pipe(
     switchMap(async (response) => {
       if (response.ok) {
         return response.json() as Promise<RouletteStats[]>;
