@@ -12,5 +12,5 @@ export const retryDelayStrategy = (scalingDuration = 3000) => ({
 });
 
 const isRetryAllowed = (error: { status: number }) => {
-  return error.status === 404;
+  return error.status === 404 || error.status === 502;
 };

@@ -19,7 +19,7 @@ export interface RouletteStats {
 export type CombinedRouletteTypes = RouletteNumberProps & RouletteStats;
 
 export interface AppState {
-  configurationId: string | null;
+  configurationId: string;
   configuration: RouletteConfig | null;
   statistics: RouletteStats[] | null;
   rouletteNumbers: RouletteNumberProps[] | null;

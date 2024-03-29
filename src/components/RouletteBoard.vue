@@ -1,6 +1,7 @@
 <template>
   <div class="boar-component">
-    <input class="game-url-input" v-model="configId" />
+    <span>Give an id to {{ configUrl }}</span>
+    <input class="game-url-input" :placeholder="configUrl" v-model="configId" />
     <div class="roulette-board">
       <RouletteNumber
         v-for="item in numberColors"
@@ -14,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted, watch } from "vue";
-import { actions, state$ } from "@/store";
+import { updateConfigurationId, state$ } from "@/store";
 import RouletteNumber from "./RouletteNumber.vue";
 import { BASE_URL } from "@/utils/utils";
 import { RouletteNumberProps } from "@/interfaces/interfaces";
@@ -24,24 +25,25 @@ export default defineComponent({
     RouletteNumber,
   },
   setup() {
-    const configId = ref(`${BASE_URL}1`);
+    const configUrl = ref(`${BASE_URL}1`);
+    const configId = ref("");
     const numberColors = ref<RouletteNumberProps[]>([]);
     onMounted(() => {
       const subscription = state$.subscribe((state) => {
-        if (state.rouletteNumbers) {
+        if (state.configurationId && state.rouletteNumbers) {
+          configId.value = state.configurationId;
           numberColors.value = state.rouletteNumbers;
         }
       });
-      // Dispatch action to update configuration ID based on local state
-      actions.updateConfigurationId.next(configId.value);
       onUnmounted(() => {
         subscription.unsubscribe();
       });
     });
     watch(configId, (newValue) => {
-      actions.updateConfigurationId.next(newValue);
+      updateConfigurationId.next(newValue);
     });
     return {
+      configUrl,
       configId,
       numberColors,
     };
