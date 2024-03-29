@@ -1,14 +1,7 @@
-import { BASE_URL } from "@/utils/utils";
-import { from, Observable } from "rxjs";
-import { switchMap } from "rxjs/operators";
-
-interface RouletteConfig {
-  colors: string[];
-  positionToId: number[];
-  name: string;
-  results: string[];
-  slots: number;
-}
+import { RouletteConfig, RouletteStats } from "@/interfaces/interfaces";
+import { from, Observable, throwError } from "rxjs";
+import { catchError, retry, switchMap } from "rxjs/operators";
+import { retryDelayStrategy } from "./errorHandling";
 
 export const fetchRouletteConfig = (
   configurationId: string
@@ -18,8 +11,32 @@ export const fetchRouletteConfig = (
       if (response.ok) {
         return response.json() as Promise<RouletteConfig>;
       } else {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
+        throw {
+          status: response.status,
+          message: `Network response was not ok: ${response.statusText}`,
+        };
       }
-    })
+    }),
+    retry(retryDelayStrategy(3000)),
+    catchError((error) => throwError(() => new Error(error.message)))
+  );
+};
+
+export const fetchRouletteStats = (
+  configurationId: string
+): Observable<RouletteStats[]> => {
+  return from(fetch(`${configurationId}/stats?limit=200`)).pipe(
+    switchMap(async (response) => {
+      if (response.ok) {
+        return response.json() as Promise<RouletteStats[]>;
+      } else {
+        throw {
+          status: response.status,
+          message: `Network response was not ok: ${response.statusText}`,
+        };
+      }
+    }),
+    retry(retryDelayStrategy(3000)),
+    catchError((error) => throwError(() => new Error(error.message)))
   );
 };

@@ -13,44 +13,34 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from "vue";
-import { map } from "rxjs/operators";
+import { defineComponent, ref, onMounted, onUnmounted, watch } from "vue";
+import { actions, state$ } from "@/store";
 import RouletteNumber from "./RouletteNumber.vue";
-import { fetchRouletteConfig } from "@/services/rouletteService";
 import { BASE_URL } from "@/utils/utils";
+import { RouletteNumberProps } from "@/interfaces/interfaces";
 
 export default defineComponent({
   components: {
     RouletteNumber,
   },
   setup() {
-    const configId = ref<string>(`${BASE_URL}1`);
-    const numberColors = ref<Array<{ number: number; color: string }>>([]);
-
-    const fetchConfig = () => {
-      fetchRouletteConfig(configId.value)
-        .pipe(
-          map((data) => {
-            return data.positionToId.map((num, index) => ({
-              number: num,
-              color: data.colors[index],
-            }));
-          })
-        )
-        .subscribe({
-          next: (numberColorMapping) => {
-            numberColors.value = numberColorMapping;
-          },
-          error: (err: Error) =>
-            console.error("Failed to fetch roulette config:", err),
-        });
-    };
-    watch(configId, (newValue, oldValue) => {
-      if (newValue !== oldValue) {
-        fetchConfig();
-      }
+    const configId = ref(`${BASE_URL}1`);
+    const numberColors = ref<RouletteNumberProps[]>([]);
+    onMounted(() => {
+      const subscription = state$.subscribe((state) => {
+        if (state.rouletteNumbers) {
+          numberColors.value = state.rouletteNumbers;
+        }
+      });
+      // Dispatch action to update configuration ID based on local state
+      actions.updateConfigurationId.next(configId.value);
+      onUnmounted(() => {
+        subscription.unsubscribe();
+      });
     });
-    onMounted(fetchConfig);
+    watch(configId, (newValue) => {
+      actions.updateConfigurationId.next(newValue);
+    });
     return {
       configId,
       numberColors,

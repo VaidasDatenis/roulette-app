@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import StatisticsView from "../views/StatisticsView.vue";
-import ActionLogsView from "../views/ActionLogsView.vue";
-import NotFoundView from "../views/NotFoundView.vue";
+import StatisticsView from "@/views/StatisticsView.vue";
+import ActionLogsView from "@/views/ActionLogsView.vue";
+import NotFoundView from "@/views/NotFoundView.vue";
 import RouletteBoardView from "@/views/RouletteBoardView.vue";
 
 const routes: Array<RouteRecordRaw> = [
