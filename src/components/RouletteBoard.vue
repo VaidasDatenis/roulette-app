@@ -56,13 +56,6 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
 
-  .game-url-input {
-    width: 40%;
-    height: 30px;
-    margin-bottom: 15px;
-    border: 1px solid rgb(206, 206, 206);
-    border-radius: 5px;
-  }
   .roulette-board {
     display: grid;
     grid-template-columns: repeat(12, 1fr);

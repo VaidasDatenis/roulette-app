@@ -1,4 +1,8 @@
-import { RouletteConfig, RouletteStats } from "@/interfaces/interfaces";
+import {
+  NextGame,
+  RouletteConfig,
+  RouletteStats,
+} from "@/interfaces/interfaces";
 import { from, Observable, throwError } from "rxjs";
 import { catchError, retry, switchMap } from "rxjs/operators";
 import { retryDelayStrategy } from "./errorHandling";
@@ -30,6 +34,43 @@ export const fetchRouletteStats = (
     switchMap((response) => {
       if (response.ok) {
         return response.json() as Promise<RouletteStats[]>;
+      } else {
+        throw {
+          status: response.status,
+          message: `Network response was not ok: ${response.statusText}`,
+        };
+      }
+    }),
+    retry(retryDelayStrategy(3000)),
+    catchError((error) => throwError(() => new Error(error.message)))
+  );
+};
+
+export const getNextGame = (configurationId: string): Observable<NextGame> => {
+  return from(fetch(`${BASE_URL}${configurationId}/nextGame`)).pipe(
+    switchMap((response) => {
+      if (response.ok) {
+        return response.json() as Promise<NextGame>;
+      } else {
+        throw {
+          status: response.status,
+          message: `Network response was not ok: ${response.statusText}`,
+        };
+      }
+    }),
+    retry(retryDelayStrategy(3000)),
+    catchError((error) => throwError(() => new Error(error.message)))
+  );
+};
+
+export const getSpinById = (
+  configurationId: string,
+  id: number
+): Observable<NextGame> => {
+  return from(fetch(`${BASE_URL}${configurationId}/game/${id}`)).pipe(
+    switchMap((response) => {
+      if (response.ok) {
+        return response.json() as Promise<NextGame>;
       } else {
         throw {
           status: response.status,
