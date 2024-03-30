@@ -12,15 +12,15 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { updateConfigurationId, state$ } from "@/store";
-const configId = ref("1");
+import { fetchConfiguration, state$ } from "@/store";
+const configId = ref("");
 onMounted(() => {
   state$.subscribe((state) => {
-    if (state.initialId) {
-      configId.value = state.initialId;
+    if (state.configurationId) {
+      configId.value = state.configurationId;
     }
   });
-  updateConfigurationId.next(configId.value);
+  fetchConfiguration.next(configId.value);
 });
 </script>
 <style lang="scss">
@@ -51,7 +51,13 @@ onMounted(() => {
     gap: 15px;
   }
 }
-
+.game-url-input {
+  width: 34.375rem;
+  height: 30px;
+  margin-bottom: 15px;
+  border: 1px solid rgb(206, 206, 206);
+  border-radius: 5px;
+}
 .router-button {
   font-weight: bold;
   color: #2c3e50;

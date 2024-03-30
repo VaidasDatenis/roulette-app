@@ -1,6 +1,9 @@
 <template>
   <div class="board-view">
-    <RouletteBoard class="board-container" />
+    <div class="board-container">
+      <RouletteBoard />
+      <EventLog />
+    </div>
     <button class="router-component-btn" @click="toggleLogView">
       Toggle Log View
     </button>
@@ -11,10 +14,12 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import RouletteBoard from "@/components/RouletteBoard.vue";
+import EventLog from "@/components/EventLog.vue";
 
 @Options({
   components: {
     RouletteBoard,
+    EventLog,
   },
 })
 export default class RouletteBoardView extends Vue {
@@ -30,7 +35,7 @@ export default class RouletteBoardView extends Vue {
   display: flex;
 
   .board-container {
-    width: 70%;
+    width: 81.25rem;
     border-right: 1px solid rgb(190, 189, 189);
     margin-right: 20px;
   }

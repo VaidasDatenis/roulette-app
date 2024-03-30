@@ -24,6 +24,7 @@ export interface AppState {
   statistics: RouletteStats[] | null;
   rouletteNumbers: RouletteNumberProps[] | null;
   statisticsNumbers: CategorizedData | null;
+  nextGame: NextGame | null;
 }
 
 export interface CategorizedData {
@@ -35,6 +36,18 @@ export interface CategorizedData {
 export interface ErrorMsg {
   status: number;
   message: string;
+}
+
+export interface NextGame {
+  uuid: string;
+  id: number;
+  startTime: Date;
+  startDelta: number;
+  startDeltaUs: number;
+  fakeStartDelta: number;
+  duration: number;
+  result: number;
+  outcome: string;
 }
 
 export enum BoardTypes {
