@@ -1,14 +1,42 @@
 <template>
   <div class="events-container">
     <span class="events-title">Events</span>
-    <input v-for="log in []" class="game-url-input" type="text" :key="log" />
+    <input class="game-url-input" :value="countdown" type="text" />
   </div>
 </template>
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onUnmounted, ref, watch } from "vue";
+import { store } from "@/store/state";
 export default defineComponent({
   setup() {
-    return {};
+    const countdown = ref<number>(0);
+    let intervalId = 0;
+    function startCountdown(duration: number) {
+      if (intervalId) clearInterval(intervalId);
+      countdown.value = duration;
+      intervalId = setInterval(() => {
+        countdown.value -= 1;
+        if (countdown.value <= 0 && intervalId) {
+          clearInterval(intervalId);
+          intervalId = 0;
+        }
+      }, 1000);
+    }
+    watch(
+      () => store.value.nextGame?.fakeStartDelta,
+      (fakeDeltaValue) => {
+        if (fakeDeltaValue) {
+          startCountdown(fakeDeltaValue);
+        }
+      },
+      { immediate: true }
+    );
+    onUnmounted(() => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    });
+    return { countdown };
   },
 });
 </script>

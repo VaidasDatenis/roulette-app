@@ -8,6 +8,7 @@ export const initialState: AppState = {
   rouletteNumbers: null,
   statisticsNumbers: null,
   nextGame: null,
+  gameResults: null,
   logs: null,
 };
 

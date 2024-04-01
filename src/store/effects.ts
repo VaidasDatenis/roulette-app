@@ -15,8 +15,9 @@ import {
   getSpinByInstanceId,
   logAction,
 } from "./actions";
-import { switchMap, tap } from "rxjs/operators";
+import { delayWhen, switchMap, tap } from "rxjs/operators";
 import { LogEntry } from "@/interfaces/interfaces";
+import { of, timer } from "rxjs";
 
 const confId = store.value.configurationId;
 
@@ -67,9 +68,17 @@ fetchStatistics
 
 fetchNextGame
   .pipe(
-    switchMap((configurationId) => getNextGame(configurationId)),
-    tap((nextGame) => {
+    switchMap((configurationId) => {
+      logAction.next("Checking for new game");
+      return getNextGame(configurationId);
+    }),
+    switchMap((nextGame) => {
       updateState({ nextGame });
+      const fakeStartDelta = nextGame.fakeStartDelta;
+      logAction.next(`sleeping for fakeStartDelta ${fakeStartDelta} sec`);
+      return of(nextGame).pipe(delayWhen(() => timer(fakeStartDelta * 1000)));
+    }),
+    tap((nextGame) => {
       getSpinByInstanceId.next(nextGame.id);
     })
   )
@@ -77,11 +86,12 @@ fetchNextGame
 
 getSpinByInstanceId
   .pipe(
-    switchMap((instanceId) =>
-      instanceId ? getSpinById(confId, instanceId) : []
-    ),
-    tap((nextGame) => {
-      updateState({ nextGame });
+    switchMap((instanceId) => {
+      logAction.next("Spinning the wheel");
+      return instanceId ? getSpinById(confId, instanceId) : [];
+    }),
+    tap((gameResults) => {
+      updateState({ gameResults });
       fetchStatistics.next(confId);
     })
   )
