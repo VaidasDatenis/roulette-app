@@ -4,10 +4,12 @@
       <RouletteBoard />
       <EventLog />
     </div>
-    <button class="router-component-btn" @click="toggleLogView">
-      Toggle Log View
-    </button>
-    <router-view />
+    <div class="logs-view-container">
+      <button class="router-component-btn" @click="toggleLogView">
+        Toggle Log View
+      </button>
+      <router-view />
+    </div>
   </div>
 </template>
 
@@ -35,9 +37,15 @@ export default class RouletteBoardView extends Vue {
   display: flex;
 
   .board-container {
-    width: 81.25rem;
+    width: 61.25rem;
     border-right: 1px solid rgb(190, 189, 189);
     margin-right: 20px;
+  }
+
+  .logs-view-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .router-component-btn {

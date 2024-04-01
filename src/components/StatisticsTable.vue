@@ -86,24 +86,15 @@
 </template>
 <script lang="ts">
 import { defineComponent, onMounted, onUnmounted, ref } from "vue";
-import {
-  CategorizedData,
-  StatsCategories,
-  RouletteColors,
-} from "@/interfaces/interfaces";
+import { CategorizedData, StatsCategories } from "@/interfaces/interfaces";
 import { state$ } from "@/store";
+import { getColor } from "@/utils/utils";
 
 export default defineComponent({
   setup() {
     const statsCategoriesEnum = StatsCategories;
-    const rouletteColorsEnum = RouletteColors;
     const statistics = ref<CategorizedData | null>(null);
-    const getColor = (color: string) => {
-      if (color === rouletteColorsEnum.RED) return "#ff0000";
-      if (color === rouletteColorsEnum.BLACK) return "#000000";
-      if (color === rouletteColorsEnum.GREEN) return "#00ff00";
-      return "transparent";
-    };
+
     onMounted(() => {
       const subscription = state$.subscribe((state) => {
         statistics.value = state.statisticsNumbers;

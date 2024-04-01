@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <p>Action logs</p>
-  </div>
+  <p>Action logs</p>
+  <ActionLogs />
 </template>
 
 <script lang="ts">
@@ -15,4 +14,3 @@ import ActionLogs from "@/components/ActionLogs.vue";
 })
 export default class ActionLogsView extends Vue {}
 </script>
-<style scoped lang="scss"></style>
