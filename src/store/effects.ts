@@ -35,7 +35,12 @@ logAction
   .subscribe();
 
 updateConfigurationId
-  .pipe(tap((configurationId) => updateState({ configurationId })))
+  .pipe(
+    tap((configurationId) => {
+      updateState({ configurationId });
+      fetchConfiguration.next(configurationId);
+    })
+  )
   .subscribe();
 
 fetchConfiguration

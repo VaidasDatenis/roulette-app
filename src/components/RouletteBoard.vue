@@ -1,7 +1,10 @@
 <template>
-  <div class="boar-component">
-    <span>Give an id to {{ configUrl }}</span>
-    <input class="game-url-input" :placeholder="configUrl" v-model="configId" />
+  <div class="board-component">
+    <select class="game-url-input board-selection" v-model="configId">
+      <option disabled value="">Please select one</option>
+      <option value="1">Single zero</option>
+      <option value="2">Double zero</option>
+    </select>
     <div class="roulette-board">
       <RouletteNumber
         v-for="item in numberColors"
@@ -50,11 +53,15 @@ export default defineComponent({
 });
 </script>
 <style scoped lang="scss">
-.boar-component {
+.board-component {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  .board-selection {
+    width: 10rem;
+  }
 
   .roulette-board {
     display: grid;
