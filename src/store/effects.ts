@@ -13,10 +13,25 @@ import {
   fetchNextGame,
   getSpinByUuid,
   getSpinByInstanceId,
+  logAction,
 } from "./actions";
 import { switchMap, tap } from "rxjs/operators";
+import { LogEntry } from "@/interfaces/interfaces";
 
 const confId = store.value.configurationId;
+
+logAction
+  .pipe(
+    tap((message) => {
+      const newLog: LogEntry = {
+        timestamp: new Date(),
+        message,
+      };
+      const updatedLogs = [...(store.value.logs || []), newLog];
+      updateState({ logs: updatedLogs });
+    })
+  )
+  .subscribe();
 
 updateConfigurationId
   .pipe(tap((configurationId) => updateState({ configurationId })))
@@ -24,7 +39,10 @@ updateConfigurationId
 
 fetchConfiguration
   .pipe(
-    switchMap((configurationId) => fetchRouletteConfig(configurationId)),
+    switchMap((configurationId) => {
+      logAction.next("Loading game board");
+      return fetchRouletteConfig(configurationId);
+    }),
     tap((configuration) => {
       const rouletteNumbers = mapNumbersToColors(configuration);
       updateState({ configuration, rouletteNumbers });

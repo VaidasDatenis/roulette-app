@@ -1,5 +1,6 @@
 import {
   CombinedRouletteStats,
+  RouletteColors,
   RouletteNumberProps,
   RouletteStats,
 } from "@/interfaces/interfaces";
@@ -24,4 +25,11 @@ export const mapStatsToNumbers = (
           : foundNumber?.rouletteColor || "defaultColor",
     };
   });
+};
+
+export const getColor = (color: string) => {
+  if (color === RouletteColors.RED) return "#ff0000";
+  if (color === RouletteColors.BLACK) return "#000000";
+  if (color === RouletteColors.GREEN) return "#00ff00";
+  return "transparent";
 };

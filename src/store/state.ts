@@ -8,6 +8,7 @@ export const initialState: AppState = {
   rouletteNumbers: null,
   statisticsNumbers: null,
   nextGame: null,
+  logs: null,
 };
 
 export const store = new BehaviorSubject<AppState>(initialState);

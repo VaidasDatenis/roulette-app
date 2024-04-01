@@ -6,3 +6,4 @@ export const fetchStatistics = new Subject<string>();
 export const fetchNextGame = new Subject<string>();
 export const getSpinByUuid = new Subject<number>();
 export const getSpinByInstanceId = new Subject<number>();
+export const logAction = new Subject<string>();
