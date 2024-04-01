@@ -25,6 +25,7 @@ export interface AppState {
   rouletteNumbers: RouletteNumberProps[] | null;
   statisticsNumbers: CategorizedData | null;
   nextGame: NextGame | null;
+  gameResults: NextGame | null;
   logs: LogEntry[] | null;
 }
 
