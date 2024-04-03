@@ -26,7 +26,10 @@ export interface AppState {
   statisticsNumbers: CategorizedData | null;
   nextGame: NextGame | null;
   gameResults: NextGame | null;
-  logs: LogEntry[] | null;
+  actionLogs: LogActionEntry[] | null;
+  eventLogs: LogEventEntry[] | null;
+  countdownValue: number | null;
+  loading: boolean;
 }
 
 export interface CategorizedData {
@@ -52,8 +55,12 @@ export interface NextGame {
   outcome: string;
 }
 
-export interface LogEntry {
+export interface LogActionEntry {
   timestamp: Date;
+  message: string;
+}
+
+export interface LogEventEntry {
   message: string;
 }
 

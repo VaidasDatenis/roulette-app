@@ -5,6 +5,21 @@ import {
   RouletteNumberProps,
 } from "@/interfaces/interfaces";
 import { mapStatsToNumbers } from "@/utils/utils";
+import { updateState } from "./state";
+
+let currentCountdownIntervalId: number | null = null;
+
+export const clearCurrentCountdown = () => {
+  if (currentCountdownIntervalId !== null) {
+    clearInterval(currentCountdownIntervalId);
+    currentCountdownIntervalId = null;
+    updateState({ countdownValue: null });
+  }
+};
+
+export const setCurrentCountdownIntervalId = (intervalId: number | null) => {
+  currentCountdownIntervalId = intervalId;
+};
 
 export const mapNumbersToColors = (
   configuration: RouletteConfig

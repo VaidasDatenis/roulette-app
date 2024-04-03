@@ -9,7 +9,10 @@ export const initialState: AppState = {
   statisticsNumbers: null,
   nextGame: null,
   gameResults: null,
-  logs: null,
+  actionLogs: null,
+  eventLogs: null,
+  countdownValue: null,
+  loading: false,
 };
 
 export const store = new BehaviorSubject<AppState>(initialState);
