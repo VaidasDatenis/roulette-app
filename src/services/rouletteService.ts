@@ -69,7 +69,7 @@ export const getNextGame = (configurationId: string): Observable<NextGame> => {
 
 export const getSpinById = (
   configurationId: string,
-  id: number
+  id: string
 ): Observable<NextGame> => {
   logAction.next(`GET .../game/${id}`);
   return from(fetch(`${BASE_URL}${configurationId}/game/${id}`)).pipe(

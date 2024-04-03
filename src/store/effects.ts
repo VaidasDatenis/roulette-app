@@ -4,7 +4,12 @@ import {
   getNextGame,
   getSpinById,
 } from "@/services/rouletteService";
-import { mapNumbersToColors, processRouletteStatisticsData } from "./mutations";
+import {
+  clearCurrentCountdown,
+  setCurrentCountdownIntervalId,
+  mapNumbersToColors,
+  processRouletteStatisticsData,
+} from "./mutations";
 import { store, updateState } from "./state";
 import {
   updateConfigurationId,
@@ -14,22 +19,35 @@ import {
   getSpinByUuid,
   getSpinByInstanceId,
   logAction,
+  logEvent,
 } from "./actions";
 import { delayWhen, switchMap, tap } from "rxjs/operators";
-import { LogEntry } from "@/interfaces/interfaces";
-import { of, timer } from "rxjs";
+import { LogActionEntry, LogEventEntry } from "@/interfaces/interfaces";
+import { timer } from "rxjs";
 
 const confId = store.value.configurationId;
 
 logAction
   .pipe(
     tap((message) => {
-      const newLog: LogEntry = {
+      const newLog: LogActionEntry = {
         timestamp: new Date(),
         message,
       };
-      const updatedLogs = [...(store.value.logs || []), newLog];
-      updateState({ logs: updatedLogs });
+      const updatedLogs = [...(store.value.actionLogs || []), newLog];
+      updateState({ actionLogs: updatedLogs });
+    })
+  )
+  .subscribe();
+
+logEvent
+  .pipe(
+    tap(([gameId, result]) => {
+      const newLog: LogEventEntry = {
+        message: `Game ${gameId} has ended, result is ${result}`,
+      };
+      const updatedLogs = [...(store.value.eventLogs || []), newLog];
+      updateState({ eventLogs: updatedLogs });
     })
   )
   .subscribe();
@@ -37,7 +55,19 @@ logAction
 updateConfigurationId
   .pipe(
     tap((configurationId) => {
-      updateState({ configurationId });
+      logAction.next("Roulette board changed!");
+      clearCurrentCountdown();
+      updateState({
+        configurationId,
+        configuration: null,
+        statistics: null,
+        rouletteNumbers: null,
+        statisticsNumbers: null,
+        nextGame: null,
+        gameResults: null,
+        countdownValue: null,
+        loading: false,
+      });
       fetchConfiguration.next(configurationId);
     })
   )
@@ -50,6 +80,7 @@ fetchConfiguration
       return fetchRouletteConfig(configurationId);
     }),
     tap((configuration) => {
+      logAction.next("Checking for new game");
       const rouletteNumbers = mapNumbersToColors(configuration);
       updateState({ configuration, rouletteNumbers });
       fetchStatistics.next(confId);
@@ -59,7 +90,10 @@ fetchConfiguration
 
 fetchStatistics
   .pipe(
-    switchMap((configurationId) => fetchRouletteStats(configurationId)),
+    switchMap((configurationId) => {
+      logAction.next("Spinning the wheel");
+      return fetchRouletteStats(configurationId);
+    }),
     tap((statistics) => {
       const statisticsNumbers = processRouletteStatisticsData({
         ...store.value,
@@ -74,29 +108,36 @@ fetchStatistics
 fetchNextGame
   .pipe(
     switchMap((configurationId) => {
-      logAction.next("Checking for new game");
+      updateState({ loading: true });
       return getNextGame(configurationId);
     }),
-    switchMap((nextGame) => {
-      updateState({ nextGame });
+    tap((nextGame) => {
+      clearCurrentCountdown();
       const fakeStartDelta = nextGame.fakeStartDelta;
       logAction.next(`sleeping for fakeStartDelta ${fakeStartDelta} sec`);
-      return of(nextGame).pipe(delayWhen(() => timer(fakeStartDelta * 1000)));
+      updateState({ loading: false, nextGame, countdownValue: fakeStartDelta });
+      let countdown = fakeStartDelta;
+      const intervalId = setInterval(() => {
+        countdown -= 1;
+        updateState({ countdownValue: countdown });
+        if (countdown <= 0) {
+          clearCurrentCountdown();
+        }
+      }, 1000);
+      setCurrentCountdownIntervalId(intervalId);
     }),
-    tap((nextGame) => {
-      getSpinByInstanceId.next(nextGame.id);
-    })
+    delayWhen((nextGame) => timer(nextGame.fakeStartDelta * 1000)),
+    tap((nextGame) => getSpinByInstanceId.next(nextGame.id))
   )
   .subscribe();
 
 getSpinByInstanceId
   .pipe(
-    switchMap((instanceId) => {
-      logAction.next("Spinning the wheel");
-      return instanceId ? getSpinById(confId, instanceId) : [];
-    }),
+    switchMap((instanceId) => getSpinById(confId, instanceId.toString())),
     tap((gameResults) => {
       updateState({ gameResults });
+      logAction.next(`Result is ${gameResults.result}`);
+      logEvent.next([gameResults.id, gameResults.result]);
       fetchStatistics.next(confId);
     })
   )
@@ -105,8 +146,6 @@ getSpinByInstanceId
 getSpinByUuid
   .pipe(
     switchMap((uuid) => (uuid ? getSpinById(confId, uuid) : [])),
-    tap((nextGame) => {
-      updateState({ nextGame });
-    })
+    tap((nextGame) => updateState({ nextGame }))
   )
   .subscribe();

@@ -11,16 +11,16 @@ import {
   ref,
   watch,
 } from "vue";
-import { LogEntry } from "@/interfaces/interfaces";
+import { LogActionEntry } from "@/interfaces/interfaces";
 import { state$ } from "@/store";
 export default defineComponent({
   setup() {
-    const logs = ref<LogEntry[]>([]);
+    const logs = ref<LogActionEntry[]>([]);
     const logTextarea = ref<HTMLTextAreaElement | null>(null);
     onMounted(() => {
       const subscription = state$.subscribe((state) => {
-        if (state.logs) {
-          logs.value = state.logs;
+        if (state.actionLogs) {
+          logs.value = state.actionLogs;
         }
       });
 

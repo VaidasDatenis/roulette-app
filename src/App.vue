@@ -51,7 +51,7 @@ onMounted(() => {
     gap: 15px;
   }
 }
-.game-url-input {
+.game-input {
   width: 34.375rem;
   height: 30px;
   margin-bottom: 15px;
