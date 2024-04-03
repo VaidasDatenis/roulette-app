@@ -11,13 +11,25 @@
         :key="item.rouletteNumber"
         :number="item.rouletteNumber"
         :color="item.rouletteColor"
+        :isWinning="item.rouletteResult === winningNumber"
+        :isSelected="item.rouletteResult === setSelectedNumber"
+        :isResultMatch="
+          item.rouletteResult === winningNumber &&
+          item.rouletteResult === setSelectedNumber
+        "
+        @select="handleSelect"
       />
     </div>
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted, watch } from "vue";
-import { updateConfigurationId, state$, store } from "@/store";
+import {
+  updateConfigurationId,
+  selectRouletteNumber,
+  state$,
+  store,
+} from "@/store";
 import RouletteNumber from "./RouletteNumber.vue";
 import { RouletteNumberProps } from "@/interfaces/interfaces";
 
@@ -28,12 +40,18 @@ export default defineComponent({
   setup() {
     const configId = ref("");
     const numberColors = ref<RouletteNumberProps[] | null>(null);
+    const winningNumber = ref<number | null>(null);
+    const setSelectedNumber = ref<number | null>(null);
+    const handleSelect = (selectedNumber: string) => {
+      selectRouletteNumber.next(parseInt(selectedNumber));
+      setSelectedNumber.value = parseInt(selectedNumber);
+    };
     onMounted(() => {
       const subscription = state$.subscribe((state) => {
         configId.value = state.configurationId ? state.configurationId : "";
-        numberColors.value = state.rouletteNumbers
-          ? state.rouletteNumbers
-          : null;
+        numberColors.value = state.rouletteNumbers ?? null;
+        winningNumber.value = state.gameResults?.result ?? null;
+        setSelectedNumber.value = state.selectedRouletteNumber ?? null;
       });
       onUnmounted(() => {
         subscription.unsubscribe();
@@ -47,6 +65,9 @@ export default defineComponent({
     return {
       configId,
       numberColors,
+      winningNumber,
+      setSelectedNumber,
+      handleSelect,
     };
   },
 });

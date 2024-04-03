@@ -1,5 +1,5 @@
 <template>
-  <input class="game-input" type="text" :value="$props.eventMessage" />
+  <input disabled class="game-input" type="text" :value="$props.eventMessage" />
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";

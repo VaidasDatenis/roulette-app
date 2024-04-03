@@ -18,6 +18,7 @@ export const mapStatsToNumbers = (
     );
     return {
       ...stats,
+      rouletteResult: stats.result,
       rouletteNumber: stats.result === 37 ? "00" : numberString,
       rouletteColor:
         stats.result === 37

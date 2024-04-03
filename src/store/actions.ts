@@ -8,3 +8,4 @@ export const getSpinByUuid = new Subject<string>();
 export const getSpinByInstanceId = new Subject<number>();
 export const logAction = new Subject<string>();
 export const logEvent = new Subject<[number, number]>();
+export const selectRouletteNumber = new Subject<number>();

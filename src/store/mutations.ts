@@ -26,6 +26,7 @@ export const mapNumbersToColors = (
 ): RouletteNumberProps[] => {
   if (!configuration) return [];
   return configuration.positionToId.map((num, index) => ({
+    rouletteResult: num,
     rouletteNumber:
       configuration.slots === 38 && num === 37 ? "00" : num.toString(),
     rouletteColor:
