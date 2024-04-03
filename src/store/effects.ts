@@ -20,6 +20,7 @@ import {
   getSpinByInstanceId,
   logAction,
   logEvent,
+  selectRouletteNumber,
 } from "./actions";
 import { delayWhen, switchMap, tap } from "rxjs/operators";
 import { LogActionEntry, LogEventEntry } from "@/interfaces/interfaces";
@@ -52,6 +53,12 @@ logEvent
   )
   .subscribe();
 
+selectRouletteNumber
+  .pipe(
+    tap((selectedRouletteNumber) => updateState({ selectedRouletteNumber }))
+  )
+  .subscribe();
+
 updateConfigurationId
   .pipe(
     tap((configurationId) => {
@@ -67,6 +74,7 @@ updateConfigurationId
         gameResults: null,
         countdownValue: null,
         loading: false,
+        selectedRouletteNumber: null,
       });
       fetchConfiguration.next(configurationId);
     })

@@ -13,6 +13,7 @@ export const initialState: AppState = {
   eventLogs: null,
   countdownValue: null,
   loading: false,
+  selectedRouletteNumber: null,
 };
 
 export const store = new BehaviorSubject<AppState>(initialState);

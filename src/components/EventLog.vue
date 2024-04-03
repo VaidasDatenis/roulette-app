@@ -19,14 +19,7 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch,
-} from "vue";
+import { computed, defineComponent, onMounted, onUnmounted, ref } from "vue";
 import { state$ } from "@/store/state";
 import { NextGame, LogEventEntry } from "@/interfaces/interfaces";
 import EventInput from "./EventInput.vue";

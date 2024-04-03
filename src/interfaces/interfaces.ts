@@ -9,6 +9,7 @@ export interface RouletteConfig {
 export interface RouletteNumberProps {
   rouletteNumber: string;
   rouletteColor: string;
+  rouletteResult: number;
 }
 
 export interface RouletteStats {
@@ -30,6 +31,7 @@ export interface AppState {
   eventLogs: LogEventEntry[] | null;
   countdownValue: number | null;
   loading: boolean;
+  selectedRouletteNumber: number | null;
 }
 
 export interface CategorizedData {
