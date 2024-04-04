@@ -66,19 +66,19 @@
           v-for="item in statistics?.[statsCategoriesEnum.COLD]"
           :key="item.statisticsResult"
         >
-          <td class="category-cold">{{ item.count }}</td>
+          <td class="category-cold">{{ item.rouletteNumberCount }}</td>
         </template>
         <template
           v-for="item in statistics?.[statsCategoriesEnum.NEUTRAL]"
           :key="item.statisticsResult"
         >
-          <td class="category-neutral">{{ item.count }}</td>
+          <td class="category-neutral">{{ item.rouletteNumberCount }}</td>
         </template>
         <template
           v-for="item in statistics?.[statsCategoriesEnum.HOT]"
           :key="item.statisticsResult"
         >
-          <td class="category-hot">{{ item.count }}</td>
+          <td class="category-hot">{{ item.rouletteNumberCount }}</td>
         </template>
       </tr>
     </tbody>

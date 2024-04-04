@@ -1,6 +1,6 @@
 import {
   NextGame,
-  RouletteConfig,
+  RouletteConfiguration,
   RouletteStats,
 } from "@/interfaces/interfaces";
 import { from, Observable, throwError } from "rxjs";
@@ -11,12 +11,12 @@ import { logAction } from "@/store";
 
 export const fetchRouletteConfig = (
   configurationId: string
-): Observable<RouletteConfig> => {
+): Observable<RouletteConfiguration> => {
   logAction.next("GET .../configuration");
   return from(fetch(`${BASE_URL}${configurationId}/configuration`)).pipe(
     switchMap((response) => {
       if (response.ok) {
-        return response.json() as Promise<RouletteConfig>;
+        return from(response.json() as Promise<RouletteConfiguration>);
       } else {
         throw {
           status: response.status,
@@ -36,7 +36,7 @@ export const fetchRouletteStats = (
   return from(fetch(`${BASE_URL}${configurationId}/stats?limit=200`)).pipe(
     switchMap((response) => {
       if (response.ok) {
-        return response.json() as Promise<RouletteStats[]>;
+        return from(response.json() as Promise<RouletteStats[]>);
       } else {
         throw {
           status: response.status,
@@ -54,7 +54,7 @@ export const getNextGame = (configurationId: string): Observable<NextGame> => {
   return from(fetch(`${BASE_URL}${configurationId}/nextGame`)).pipe(
     switchMap((response) => {
       if (response.ok) {
-        return response.json() as Promise<NextGame>;
+        return from(response.json() as Promise<NextGame>);
       } else {
         throw {
           status: response.status,
@@ -75,7 +75,7 @@ export const getSpinById = (
   return from(fetch(`${BASE_URL}${configurationId}/game/${id}`)).pipe(
     switchMap((response) => {
       if (response.ok) {
-        return response.json() as Promise<NextGame>;
+        return from(response.json() as Promise<NextGame>);
       } else {
         throw {
           status: response.status,
@@ -98,7 +98,7 @@ export const getHistoryByConfigId = (
   ).pipe(
     switchMap((response) => {
       if (response.ok) {
-        return response.json() as Promise<NextGame[]>;
+        return from(response.json() as Promise<NextGame[]>);
       } else {
         throw {
           status: response.status,

@@ -1,4 +1,4 @@
-export interface RouletteConfig {
+export interface RouletteConfiguration {
   name: string;
   slots: number;
   results: string[];
@@ -10,6 +10,7 @@ export interface RouletteNumberProps {
   rouletteNumber: string;
   rouletteColor: string;
   rouletteResult: number;
+  rouletteNumberCount?: number;
 }
 
 export interface RouletteStats {
@@ -17,12 +18,9 @@ export interface RouletteStats {
   count: number;
 }
 
-export type CombinedRouletteStats = RouletteNumberProps & RouletteStats;
-
 export interface AppState {
   configurationId: string;
-  configuration: RouletteConfig | null;
-  statistics: RouletteStats[] | null;
+  configuration: RouletteConfiguration | null;
   rouletteNumbers: RouletteNumberProps[] | null;
   statisticsNumbers: CategorizedData | null;
   nextGame: NextGame | null;
@@ -36,9 +34,9 @@ export interface AppState {
 }
 
 export interface CategorizedData {
-  cold: CombinedRouletteStats[];
-  neutral: CombinedRouletteStats[];
-  hot: CombinedRouletteStats[];
+  cold: RouletteNumberProps[];
+  neutral: RouletteNumberProps[];
+  hot: RouletteNumberProps[];
 }
 
 export interface ErrorMsg {

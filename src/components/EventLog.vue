@@ -34,7 +34,7 @@ export default defineComponent({
       const subscription = state$.subscribe((state) => {
         nextGameCountdown.value = state.countdownValue ?? null;
         currentGameResult.value = state.nextGame ?? null;
-        eventResults.value = state.eventLogs ?? null;
+        eventResults.value = state.eventLogs;
         loading.value = state.loading;
       });
       onUnmounted(() => {

@@ -18,7 +18,6 @@ import {
   fetchConfiguration,
   fetchStatistics,
   fetchNextGame,
-  getSpinByUuid,
   getSpinByInstanceId,
   logAction,
   logEvent,
@@ -70,7 +69,6 @@ updateConfigurationId
       updateState({
         configurationId,
         configuration: null,
-        statistics: null,
         rouletteNumbers: null,
         statisticsNumbers: null,
         nextGame: null,
@@ -106,12 +104,19 @@ fetchStatistics
       return fetchRouletteStats(configurationId);
     }),
     tap((statistics) => {
-      const statisticsNumbers = processRouletteStatisticsData({
-        ...store.value,
-        statistics,
-      });
-      updateState({ statistics, statisticsNumbers });
-      fetchNextGame.next(storeConfId);
+      if (
+        statistics &&
+        store.value.rouletteNumbers &&
+        store.value.configuration
+      ) {
+        const statisticsNumbers = processRouletteStatisticsData(
+          store.value.rouletteNumbers,
+          store.value.configuration.slots,
+          statistics
+        );
+        updateState({ statisticsNumbers, selectedRouletteNumber: null });
+        fetchNextGame.next(storeConfId);
+      }
     })
   )
   .subscribe();
@@ -120,51 +125,51 @@ fetchNextGame
   .pipe(
     switchMap((configurationId) => {
       updateState({ loading: true });
-      return getNextGame(configurationId);
-    }),
-    tap((nextGame) => {
-      clearCurrentCountdown();
-      const fakeStartDelta = nextGame.fakeStartDelta;
-      logAction.next(`sleeping for fakeStartDelta ${fakeStartDelta} sec`);
-      updateState({ loading: false, nextGame, countdownValue: fakeStartDelta });
-      let countdown = fakeStartDelta;
-      const intervalId = setInterval(() => {
-        countdown -= 1;
-        updateState({ countdownValue: countdown });
-        if (countdown <= 0) {
+      return getNextGame(configurationId).pipe(
+        tap((nextGame) => {
           clearCurrentCountdown();
-        }
-      }, 1000);
-      setCurrentCountdownIntervalId(intervalId);
-    }),
-    delayWhen((nextGame) => timer(nextGame.fakeStartDelta * 1000)),
-    tap((nextGame) => getSpinByInstanceId.next(nextGame.id))
+          const fakeStartDelta = nextGame.fakeStartDelta;
+          logAction.next(`sleeping for fakeStartDelta ${fakeStartDelta} sec`);
+          updateState({
+            loading: false,
+            nextGame,
+            countdownValue: fakeStartDelta,
+          });
+          let countdown = fakeStartDelta;
+          const intervalId = setInterval(() => {
+            countdown -= 1;
+            updateState({ countdownValue: countdown });
+            if (countdown <= 0) {
+              clearCurrentCountdown();
+            }
+          }, 1000);
+          setCurrentCountdownIntervalId(intervalId);
+        }),
+        delayWhen((nextGame) => timer(nextGame.fakeStartDelta * 1000)),
+        tap((nextGame) => getSpinByInstanceId.next(nextGame.id))
+      );
+    })
   )
   .subscribe();
 
 getSpinByInstanceId
   .pipe(
-    switchMap((instanceId) => getSpinById(storeConfId, instanceId.toString())),
-    tap((gameResults) => {
-      updateState({ gameResults });
-      logAction.next(`Result is ${gameResults.result}`);
-      logEvent.next([gameResults.id, gameResults.result]);
-      fetchStatistics.next(storeConfId);
-      if (store.value.eventLogs) {
-        getHistoryByConfigurationId.next([
-          storeConfId,
-          store.value.eventLogs.length,
-        ]);
-      }
-    })
-  )
-  .subscribe();
-
-// TODO: this is not being used
-getSpinByUuid
-  .pipe(
-    switchMap((uuid) => (uuid ? getSpinById(storeConfId, uuid) : [])),
-    tap((nextGame) => updateState({ nextGame }))
+    switchMap((instanceId) =>
+      getSpinById(storeConfId, instanceId.toString()).pipe(
+        tap((gameResults) => {
+          updateState({ gameResults });
+          logAction.next(`Result is ${gameResults.result}`);
+          logEvent.next([gameResults.id, gameResults.result]);
+          fetchStatistics.next(storeConfId);
+          if (store.value.eventLogs) {
+            getHistoryByConfigurationId.next([
+              storeConfId,
+              store.value.eventLogs.length,
+            ]);
+          }
+        })
+      )
+    )
   )
   .subscribe();
 

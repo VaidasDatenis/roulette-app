@@ -7,6 +7,9 @@
         <th class="table-header">Result</th>
       </thead>
       <tbody>
+        <tr v-if="!historyData.length">
+          <td>There were no games yet</td>
+        </tr>
         <tr v-for="game of historyData" :key="game.gameId" class="table-row">
           <td>{{ game.date }}</td>
           <td>{{ game.gameId }}</td>

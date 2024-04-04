@@ -4,7 +4,6 @@ import { BehaviorSubject } from "rxjs";
 export const initialState: AppState = {
   configurationId: "1",
   configuration: null,
-  statistics: null,
   rouletteNumbers: null,
   statisticsNumbers: null,
   nextGame: null,
