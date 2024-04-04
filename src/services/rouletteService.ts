@@ -87,3 +87,26 @@ export const getSpinById = (
     catchError((error) => throwError(() => new Error(error.message)))
   );
 };
+
+export const getHistoryByConfigId = (
+  configurationId: string,
+  loadLimit: number
+): Observable<NextGame[]> => {
+  logAction.next(`GET .../history?limit=${loadLimit}`);
+  return from(
+    fetch(`${BASE_URL}${configurationId}/history?limit=${loadLimit}`)
+  ).pipe(
+    switchMap((response) => {
+      if (response.ok) {
+        return response.json() as Promise<NextGame[]>;
+      } else {
+        throw {
+          status: response.status,
+          message: `Network response was not ok: ${response.statusText}`,
+        };
+      }
+    }),
+    retry(retryDelayStrategy(3000)),
+    catchError((error) => throwError(() => new Error(error.message)))
+  );
+};

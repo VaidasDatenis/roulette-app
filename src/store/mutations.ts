@@ -1,10 +1,12 @@
 import {
   AppState,
   CategorizedData,
+  HistoryTableData,
+  NextGame,
   RouletteConfig,
   RouletteNumberProps,
 } from "@/interfaces/interfaces";
-import { mapStatsToNumbers } from "@/utils/utils";
+import { formatDateString, mapStatsToNumbers } from "@/utils/utils";
 import { updateState } from "./state";
 
 let currentCountdownIntervalId: number | null = null;
@@ -51,4 +53,14 @@ export const processRouletteStatisticsData = (
     neutral: mapStatsToNumbers(state.rouletteNumbers, neutralStats),
     hot: mapStatsToNumbers(state.rouletteNumbers, hotStats),
   };
+};
+
+export const mapPreviousGamesToHistoryTable = (
+  previousGames: NextGame[]
+): HistoryTableData[] => {
+  return previousGames.map((game) => ({
+    date: formatDateString(game.startTime),
+    gameId: game.id,
+    gameResult: game.outcome,
+  }));
 };

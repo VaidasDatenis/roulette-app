@@ -14,6 +14,7 @@ export const initialState: AppState = {
   countdownValue: null,
   loading: false,
   selectedRouletteNumber: null,
+  previousGames: null,
 };
 
 export const store = new BehaviorSubject<AppState>(initialState);
