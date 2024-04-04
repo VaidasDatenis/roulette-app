@@ -3,12 +3,14 @@ import {
   fetchRouletteStats,
   getNextGame,
   getSpinById,
+  getHistoryByConfigId,
 } from "@/services/rouletteService";
 import {
   clearCurrentCountdown,
   setCurrentCountdownIntervalId,
   mapNumbersToColors,
   processRouletteStatisticsData,
+  mapPreviousGamesToHistoryTable,
 } from "./mutations";
 import { store, updateState } from "./state";
 import {
@@ -21,12 +23,13 @@ import {
   logAction,
   logEvent,
   selectRouletteNumber,
+  getHistoryByConfigurationId,
 } from "./actions";
 import { delayWhen, switchMap, tap } from "rxjs/operators";
 import { LogActionEntry, LogEventEntry } from "@/interfaces/interfaces";
 import { timer } from "rxjs";
 
-const confId = store.value.configurationId;
+const storeConfId = store.value.configurationId;
 
 logAction
   .pipe(
@@ -91,7 +94,7 @@ fetchConfiguration
       logAction.next("Checking for new game");
       const rouletteNumbers = mapNumbersToColors(configuration);
       updateState({ configuration, rouletteNumbers });
-      fetchStatistics.next(confId);
+      fetchStatistics.next(storeConfId);
     })
   )
   .subscribe();
@@ -108,7 +111,7 @@ fetchStatistics
         statistics,
       });
       updateState({ statistics, statisticsNumbers });
-      fetchNextGame.next(confId);
+      fetchNextGame.next(storeConfId);
     })
   )
   .subscribe();
@@ -141,19 +144,38 @@ fetchNextGame
 
 getSpinByInstanceId
   .pipe(
-    switchMap((instanceId) => getSpinById(confId, instanceId.toString())),
+    switchMap((instanceId) => getSpinById(storeConfId, instanceId.toString())),
     tap((gameResults) => {
       updateState({ gameResults });
       logAction.next(`Result is ${gameResults.result}`);
       logEvent.next([gameResults.id, gameResults.result]);
-      fetchStatistics.next(confId);
+      fetchStatistics.next(storeConfId);
+      if (store.value.eventLogs) {
+        getHistoryByConfigurationId.next([
+          storeConfId,
+          store.value.eventLogs.length,
+        ]);
+      }
     })
   )
   .subscribe();
 
+// TODO: this is not being used
 getSpinByUuid
   .pipe(
-    switchMap((uuid) => (uuid ? getSpinById(confId, uuid) : [])),
+    switchMap((uuid) => (uuid ? getSpinById(storeConfId, uuid) : [])),
     tap((nextGame) => updateState({ nextGame }))
+  )
+  .subscribe();
+
+getHistoryByConfigurationId
+  .pipe(
+    switchMap(([configId, limit]) => getHistoryByConfigId(configId, limit)),
+    tap((unmappedPreviousGames) => {
+      const previousGames = mapPreviousGamesToHistoryTable(
+        unmappedPreviousGames
+      );
+      updateState({ previousGames });
+    })
   )
   .subscribe();

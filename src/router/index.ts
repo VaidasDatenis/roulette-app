@@ -3,6 +3,7 @@ import StatisticsView from "@/views/StatisticsView.vue";
 import ActionLogsView from "@/views/ActionLogsView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
 import RouletteBoardView from "@/views/RouletteBoardView.vue";
+import HistoryView from "@/views/HistoryView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -24,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/statistics",
     name: "statistics",
     component: StatisticsView,
+  },
+  {
+    path: "/history",
+    name: "history",
+    component: HistoryView,
   },
   {
     path: "/:catchall(.*)*",

@@ -2,10 +2,12 @@
   <nav class="nav-bar">
     <span class="component-header">Welcome to Roulette App</span>
     <div class="nav-actions">
-      <router-link class="router-button" to="/">Home</router-link> |
+      <router-link class="router-button" to="/home">Home</router-link> |
       <router-link class="router-button" to="/statistics">
         Statistics
       </router-link>
+      |
+      <router-link class="router-button" to="/history"> History </router-link>
     </div>
   </nav>
   <router-view />

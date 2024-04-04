@@ -32,6 +32,7 @@ export interface AppState {
   countdownValue: number | null;
   loading: boolean;
   selectedRouletteNumber: number | null;
+  previousGames: HistoryTableData[] | null;
 }
 
 export interface CategorizedData {
@@ -48,13 +49,19 @@ export interface ErrorMsg {
 export interface NextGame {
   uuid: string;
   id: number;
-  startTime: Date;
+  startTime: string;
   startDelta: number;
   startDeltaUs: number;
   fakeStartDelta: number;
   duration: number;
   result: number;
   outcome: string;
+}
+
+export interface HistoryTableData {
+  date: string;
+  gameId: number;
+  gameResult: string;
 }
 
 export interface LogActionEntry {

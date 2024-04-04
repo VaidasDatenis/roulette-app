@@ -32,11 +32,9 @@ export default defineComponent({
     const loading = ref<boolean>();
     onMounted(() => {
       const subscription = state$.subscribe((state) => {
-        nextGameCountdown.value = state.countdownValue
-          ? state.countdownValue
-          : null;
-        currentGameResult.value = state.nextGame ? state.nextGame : null;
-        eventResults.value = state.eventLogs;
+        nextGameCountdown.value = state.countdownValue ?? null;
+        currentGameResult.value = state.nextGame ?? null;
+        eventResults.value = state.eventLogs ?? null;
         loading.value = state.loading;
       });
       onUnmounted(() => {

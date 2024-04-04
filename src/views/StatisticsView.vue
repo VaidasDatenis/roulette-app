@@ -1,4 +1,5 @@
 <template>
+  <span>Statistics table</span>
   <div class="statistics-container">
     <StatisticsTable />
   </div>
