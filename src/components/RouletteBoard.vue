@@ -12,10 +12,10 @@
         :number="item.rouletteNumber"
         :color="item.rouletteColor"
         :isWinning="item.rouletteResult === winningNumber"
-        :isSelected="item.rouletteResult === setSelectedNumber"
+        :isSelected="item.rouletteNumber === setSelectedNumber"
         :isResultMatch="
           item.rouletteResult === winningNumber &&
-          item.rouletteResult === setSelectedNumber
+          item.rouletteNumber === setSelectedNumber
         "
         @select="handleSelect"
       />
@@ -41,10 +41,10 @@ export default defineComponent({
     const configId = ref("");
     const numberColors = ref<RouletteNumberProps[] | null>(null);
     const winningNumber = ref<number | null>(null);
-    const setSelectedNumber = ref<number | null>(null);
+    const setSelectedNumber = ref<string | null>(null);
     const handleSelect = (selectedNumber: string) => {
-      selectRouletteNumber.next(parseInt(selectedNumber));
-      setSelectedNumber.value = parseInt(selectedNumber);
+      selectRouletteNumber.next(selectedNumber);
+      setSelectedNumber.value = selectedNumber;
     };
     onMounted(() => {
       const subscription = state$.subscribe((state) => {
