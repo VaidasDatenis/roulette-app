@@ -1,5 +1,5 @@
 # roulette-app
-# NO - IT IS NOT FINISHED
+# Finished - available for reviews!
 ## Project setup
 ```
 npm install
