@@ -29,7 +29,7 @@ export interface AppState {
   eventLogs: LogEventEntry[] | null;
   countdownValue: number | null;
   loading: boolean;
-  selectedRouletteNumber: number | null;
+  selectedRouletteNumber: string | null;
   previousGames: HistoryTableData[] | null;
 }
 
