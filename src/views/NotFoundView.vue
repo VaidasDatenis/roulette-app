@@ -1,1 +1,3 @@
-<template>404 - This is not a path you looking for.</template>
+<template>
+  <img src="../assets/images/404-wan.jpeg" alt="Ups - not found." />
+</template>
