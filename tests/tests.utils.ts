@@ -74,7 +74,7 @@ export const expectedConfigurationMock: RouletteNumberProps[] = [
 ];
 
 export const rouletteStatsMock: RouletteStats[] = [
-  { result: 36, count: 5 },
+  { result: 37, count: 5 },
   { result: 27, count: 5 },
   { result: 10, count: 5 },
   { result: 25, count: 6 },
@@ -96,7 +96,7 @@ export const rouletteStatsMock: RouletteStats[] = [
 
 export const expectedRouletteStatisticsTableMock: RouletteNumberProps[] = [
   {
-    rouletteResult: 36,
+    rouletteResult: 37,
     rouletteNumber: "00",
     rouletteColor: "green",
     rouletteNumberCount: 5,
@@ -228,7 +228,7 @@ export const expectedRouletteNumbersStatisticsMock: RouletteNumberProps[] = [
 
 export const expectedColdCategorizedMock: RouletteNumberProps[] = [
   {
-    rouletteResult: 36,
+    rouletteResult: 37,
     rouletteNumber: "00",
     rouletteColor: "green",
     rouletteNumberCount: 5,

@@ -1,5 +1,5 @@
 import { RouletteConfiguration } from "@/interfaces/interfaces";
-import { mapNumbersToColors } from "@/store/mutations";
+import { mapNumbersToColors } from "@/store/selectors";
 import {
   expectedConfigurationMock,
   mockConfigurationMock,

@@ -1,4 +1,4 @@
-import { mapStatsToNumbers } from "@/store/mutations";
+import { mapStatsToNumbers } from "@/store/selectors";
 import {
   expectedConfigurationMock,
   expectedRouletteStatisticsTableMock,
