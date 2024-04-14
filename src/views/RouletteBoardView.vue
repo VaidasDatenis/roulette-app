@@ -12,24 +12,18 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import { Options, Vue } from "vue-class-component";
+<script setup lang="ts">
+import { useRouter, useRoute } from "vue-router";
 import RouletteBoard from "@/components/RouletteBoard.vue";
 import EventLog from "@/components/EventLog.vue";
 
-@Options({
-  components: {
-    RouletteBoard,
-    EventLog,
-  },
-})
-export default class RouletteBoardView extends Vue {
-  toggleLogView() {
-    this.$route.path.includes("/home/logs")
-      ? this.$router.push("/home")
-      : this.$router.push("/home/logs");
-  }
+const route = useRoute();
+const router = useRouter();
+
+function toggleLogView() {
+  route.path.includes("/home/logs")
+    ? router.push("/home")
+    : router.push("/home/logs");
 }
 </script>
 <style scoped lang="scss">

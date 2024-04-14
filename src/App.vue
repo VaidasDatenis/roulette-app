@@ -13,16 +13,14 @@
   <router-view />
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { fetchConfiguration, state$ } from "@/store";
-const configId = ref("");
+import { computed, onMounted } from "vue";
+import { fetchConfiguration$, store } from "@/store";
+import { getConfigurationId } from "./store/selectors";
+
+const configurationId = computed(() => getConfigurationId(store.value));
+
 onMounted(() => {
-  state$.subscribe((state) => {
-    if (state.configurationId) {
-      configId.value = state.configurationId;
-    }
-  });
-  fetchConfiguration.next(configId.value);
+  fetchConfiguration$.next(configurationId.value);
 });
 </script>
 <style lang="scss">

@@ -6,65 +6,81 @@ import {
   getHistoryByConfigId,
 } from "@/services/rouletteService";
 import {
-  clearCurrentCountdown,
-  setCurrentCountdownIntervalId,
   mapNumbersToColors,
   processRouletteStatisticsData,
   mapPreviousGamesToHistoryTable,
-} from "./mutations";
+  applyRetryStrategy,
+  clearCurrentCountdown,
+  handleCountdown,
+  incrementGameCount,
+} from "./selectors";
 import { store, updateState } from "./state";
 import {
-  updateConfigurationId,
-  fetchConfiguration,
-  fetchStatistics,
-  fetchNextGame,
-  getSpinByInstanceId,
-  logAction,
-  logEvent,
-  selectRouletteNumber,
-  getHistoryByConfigurationId,
+  fetchConfiguration$,
+  fetchStatistics$,
+  fetchNextGame$,
+  getSpinByInstanceId$,
+  logAction$,
+  logEvent$,
+  selectRouletteNumber$,
+  getHistoryByConfigurationId$,
+  configurationChange$,
 } from "./actions";
-import { delayWhen, switchMap, tap } from "rxjs/operators";
-import { LogActionEntry, LogEventEntry } from "@/interfaces/interfaces";
+import {
+  delay,
+  delayWhen,
+  distinctUntilChanged,
+  shareReplay,
+  switchMap,
+  tap,
+} from "rxjs/operators";
+import {
+  ConfigId,
+  LogActionEntry,
+  LogEventEntry,
+} from "@/interfaces/interfaces";
 import { timer } from "rxjs";
 
-const storeConfId = store.value.configurationId;
-
-logAction
+logAction$
   .pipe(
     tap((message) => {
-      const newLog: LogActionEntry = {
-        timestamp: new Date(),
-        message,
-      };
-      const updatedLogs = [...(store.value.actionLogs || []), newLog];
-      updateState({ actionLogs: updatedLogs });
-    })
+      if (message) {
+        const newLog: LogActionEntry = {
+          timestamp: new Date(),
+          message,
+        };
+        const updatedLogs = [...(store.value.actionLogs || []), newLog];
+        updateState({ actionLogs: updatedLogs });
+      }
+    }),
   )
   .subscribe();
 
-logEvent
+logEvent$
   .pipe(
     tap(([gameId, result]) => {
-      const newLog: LogEventEntry = {
-        message: `Game ${gameId} has ended, result is ${result}`,
-      };
-      const updatedLogs = [...(store.value.eventLogs || []), newLog];
-      updateState({ eventLogs: updatedLogs });
-    })
+      if (gameId && result) {
+        const newLog: LogEventEntry = {
+          message: `Game ${gameId} has ended, result is ${result}`,
+        };
+        const updatedLogs = [...(store.value.eventLogs || []), newLog];
+        updateState({ eventLogs: updatedLogs });
+      }
+    }),
   )
   .subscribe();
 
-selectRouletteNumber
+selectRouletteNumber$
   .pipe(
-    tap((selectedRouletteNumber) => updateState({ selectedRouletteNumber }))
+    tap((selectedRouletteNumber) => updateState({ selectedRouletteNumber })),
   )
   .subscribe();
 
-updateConfigurationId
+configurationChange$
   .pipe(
+    distinctUntilChanged(),
     tap((configurationId) => {
-      logAction.next("Roulette board changed!");
+      logAction$.next("Roulette board changed!");
       clearCurrentCountdown();
       updateState({
         configurationId,
@@ -77,33 +93,33 @@ updateConfigurationId
         loading: false,
         selectedRouletteNumber: null,
       });
-      fetchConfiguration.next(configurationId);
-    })
+      fetchConfiguration$.next(configurationId);
+    }),
   )
   .subscribe();
 
-fetchConfiguration
+fetchConfiguration$
   .pipe(
     switchMap((configurationId) => {
-      logAction.next("Loading game board");
-      return fetchRouletteConfig(configurationId);
+      logAction$.next("Loading game board");
+      return applyRetryStrategy(fetchRouletteConfig(configurationId));
     }),
     tap((configuration) => {
-      logAction.next("Checking for new game");
+      logAction$.next("Checking for new game");
       const rouletteNumbers = mapNumbersToColors(configuration);
       updateState({ configuration, rouletteNumbers });
-      fetchStatistics.next(storeConfId);
-    })
+      fetchStatistics$.next(store.value.configurationId);
+    }),
   )
   .subscribe();
 
-fetchStatistics
+fetchStatistics$
   .pipe(
-    switchMap((configurationId) => {
-      logAction.next("Spinning the wheel");
-      return fetchRouletteStats(configurationId);
-    }),
+    switchMap((configurationId) =>
+      applyRetryStrategy(fetchRouletteStats(configurationId)),
+    ),
     tap((statistics) => {
+      logAction$.next("Spinning the wheel");
       if (
         statistics &&
         store.value.rouletteNumbers &&
@@ -112,75 +128,82 @@ fetchStatistics
         const statisticsNumbers = processRouletteStatisticsData(
           store.value.rouletteNumbers,
           store.value.configuration.slots,
-          statistics
+          statistics,
         );
         updateState({ statisticsNumbers, selectedRouletteNumber: null });
-        fetchNextGame.next(storeConfId);
+        fetchNextGame$.next();
       }
-    })
+    }),
   )
   .subscribe();
 
-fetchNextGame
+fetchNextGame$
   .pipe(
-    switchMap((configurationId) => {
+    switchMap(() => {
       updateState({ loading: true });
-      return getNextGame(configurationId).pipe(
+      return applyRetryStrategy(getNextGame(store.value.configurationId)).pipe(
         tap((nextGame) => {
           clearCurrentCountdown();
-          const fakeStartDelta = nextGame.fakeStartDelta;
-          logAction.next(`sleeping for fakeStartDelta ${fakeStartDelta} sec`);
+          logAction$.next(
+            `Starting countdown for ${nextGame.fakeStartDelta} seconds`,
+          );
           updateState({
-            loading: false,
             nextGame,
-            countdownValue: fakeStartDelta,
+            loading: false,
+            countdownValue: nextGame.fakeStartDelta,
           });
-          let countdown = fakeStartDelta;
-          const intervalId = setInterval(() => {
-            countdown -= 1;
-            updateState({ countdownValue: countdown });
-            if (countdown <= 0) {
-              clearCurrentCountdown();
-            }
-          }, 1000);
-          setCurrentCountdownIntervalId(intervalId);
+          handleCountdown(nextGame.fakeStartDelta);
         }),
         delayWhen((nextGame) => timer(nextGame.fakeStartDelta * 1000)),
-        tap((nextGame) => getSpinByInstanceId.next(nextGame.id))
       );
-    })
+    }),
+    tap((nextGame) => {
+      updateState({ isSpinning: true });
+      getSpinByInstanceId$.next(nextGame.id);
+    }),
+    shareReplay(1),
   )
   .subscribe();
 
-getSpinByInstanceId
+getSpinByInstanceId$
   .pipe(
+    delay(3000),
     switchMap((instanceId) =>
-      getSpinById(storeConfId, instanceId.toString()).pipe(
-        tap((gameResults) => {
-          updateState({ gameResults });
-          logAction.next(`Result is ${gameResults.result}`);
-          logEvent.next([gameResults.id, gameResults.result]);
-          fetchStatistics.next(storeConfId);
-          if (store.value.eventLogs) {
-            getHistoryByConfigurationId.next([
-              storeConfId,
-              store.value.eventLogs.length,
-            ]);
-          }
-        })
-      )
-    )
+      applyRetryStrategy(
+        getSpinById(store.value.configurationId, instanceId.toString()),
+      ),
+    ),
+    tap((gameResults) => {
+      if (gameResults.result) {
+        updateState({ isSpinning: false });
+        incrementGameCount();
+        updateState({ gameResults });
+        logAction$.next(`Result is ${gameResults.result}`);
+        logEvent$.next([gameResults.id, gameResults.outcome]);
+        fetchStatistics$.next(store.value.configurationId);
+      }
+    }),
   )
   .subscribe();
 
-getHistoryByConfigurationId
+getHistoryByConfigurationId$
   .pipe(
-    switchMap(([configId, limit]) => getHistoryByConfigId(configId, limit)),
-    tap((unmappedPreviousGames) => {
-      const previousGames = mapPreviousGamesToHistoryTable(
-        unmappedPreviousGames
+    switchMap(() => {
+      const currentState = store.getValue();
+      const currentConfigId = parseInt(
+        currentState.configurationId,
+      ) as ConfigId;
+      const gamesPlayed = currentState.gamesPlayed[currentConfigId];
+      return applyRetryStrategy(
+        getHistoryByConfigId(currentConfigId.toString(), gamesPlayed),
+      ).pipe(
+        tap((unmappedPreviousGames) => {
+          const previousGames = mapPreviousGamesToHistoryTable(
+            unmappedPreviousGames,
+          );
+          updateState({ previousGames });
+        }),
       );
-      updateState({ previousGames });
-    })
+    }),
   )
   .subscribe();

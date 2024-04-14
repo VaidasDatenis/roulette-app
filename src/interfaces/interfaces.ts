@@ -31,7 +31,13 @@ export interface AppState {
   loading: boolean;
   selectedRouletteNumber: string | null;
   previousGames: HistoryTableData[] | null;
+  gamesPlayed: GamesPlayed;
+  isSpinning: boolean;
 }
+
+export type ConfigId = 1 | 2;
+
+export interface GamesPlayed extends Record<ConfigId, number> {}
 
 export interface CategorizedData {
   cold: RouletteNumberProps[];
@@ -69,11 +75,6 @@ export interface LogActionEntry {
 
 export interface LogEventEntry {
   message: string;
-}
-
-export enum BoardTypes {
-  SINGLE = "singleZero",
-  DOUBLE = "doubleZero",
 }
 
 export enum StatsCategories {

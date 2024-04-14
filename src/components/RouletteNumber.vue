@@ -1,6 +1,5 @@
 <template>
   <button
-    @click="$emit('select', $props.number)"
     :class="[
       'roulette-number',
       {
@@ -12,39 +11,32 @@
     :style="{
       backgroundColor: color,
     }"
+    @click="$emit('select', props.number)"
   >
     {{ number }}
   </button>
 </template>
-
-<script lang="ts">
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  props: {
-    number: {
-      type: String,
-      required: true,
-    },
-    color: {
-      type: String,
-      required: true,
-    },
-    isWinning: {
-      type: Boolean,
-      default: false,
-    },
-    isSelected: {
-      type: Boolean,
-      default: false,
-    },
-    isResultMatch: {
-      type: Boolean,
-      default: false,
-    },
+<script setup lang="ts">
+const props = defineProps({
+  number: {
+    type: String,
+    required: true,
   },
-  setup(props) {
-    return { props };
+  color: {
+    type: String,
+    required: true,
+  },
+  isWinning: {
+    type: Boolean,
+    default: false,
+  },
+  isSelected: {
+    type: Boolean,
+    default: false,
+  },
+  isResultMatch: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>
@@ -60,6 +52,7 @@ export default defineComponent({
     transform: scale(1);
   }
 }
+
 @keyframes flash-gold {
   0%,
   100% {
@@ -69,6 +62,7 @@ export default defineComponent({
     background-color: gold;
   }
 }
+
 .roulette-number {
   width: 45px;
   height: 45px;
@@ -81,12 +75,15 @@ export default defineComponent({
   border-radius: 5px;
   cursor: pointer;
   transition: transform 0.5s ease-in-out;
+
   &.highlight-button {
     animation: highlight-animation 3s ease-in-out;
   }
+
   &.selected-button {
     border: 2px solid greenyellow;
   }
+
   &.flash-gold {
     animation: flash-gold 3s ease-in-out;
   }

@@ -1,4 +1,4 @@
-import { processRouletteStatisticsData } from "@/store/mutations";
+import { processRouletteStatisticsData } from "@/store/selectors";
 import {
   expectedColdCategorizedMock,
   expectedConfigurationMock,
@@ -12,7 +12,7 @@ describe("processRouletteStatisticsData", () => {
   const categorizedData = processRouletteStatisticsData(
     rouletteNumbers,
     slots,
-    statistics
+    statistics,
   );
   const emptyStatisticsData = processRouletteStatisticsData([], 0, []);
   const expectedColdNumbers = expectedColdCategorizedMock;

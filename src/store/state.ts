@@ -14,6 +14,11 @@ export const initialState: AppState = {
   loading: false,
   selectedRouletteNumber: null,
   previousGames: null,
+  gamesPlayed: {
+    1: 0,
+    2: 0,
+  },
+  isSpinning: false,
 };
 
 export const store = new BehaviorSubject<AppState>(initialState);
